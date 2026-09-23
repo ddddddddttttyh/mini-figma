@@ -10,7 +10,7 @@ function createId(): string {
 
 interface DragState {
   origins: Record<string, Point>
-  last: Point
+  start: Point
   snapshot: Shape[]
   moved: boolean
 }
@@ -107,17 +107,16 @@ export function useShapes() {
     }
     const count = Object.keys(origins).length
     if (count === 0) return false
-    dragRef.current = { origins, last: point, snapshot: shapesRef.current, moved: false }
+    dragRef.current = { origins, start: point, snapshot: shapesRef.current, moved: false }
     return true
   }, [])
 
   const moveDrag = useCallback((point: Point) => {
     const drag = dragRef.current
     if (!drag) return
-    const last = drag.last
-    const dx = point.x - last.x
-    const dy = point.y - last.y
-    if (dx !== 0 || dy !== 0) dragRef.current = { ...drag, last: point, moved: true }
+    const dx = point.x - drag.start.x
+    const dy = point.y - drag.start.y
+    if (dx !== 0 || dy !== 0) dragRef.current = { ...drag, moved: true }
     setShapes((prev) =>
       prev.map((s) => {
         const origin = drag.origins[s.id]
